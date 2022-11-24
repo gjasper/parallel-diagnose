@@ -1,5 +1,3 @@
-cmake_minimum_required(VERSION 3.22.1)
-project(hellotest)
 find_package(Catch2)
-add_executable(${PROJECT_NAME} hellotest.cpp)
-target_link_libraries(${PROJECT_NAME} PRIVATE Catch2::Catch2WithMain)
+add_executable(hellotest hellotest.cpp)
+target_link_libraries(hellotest PRIVATE Catch2::Catch2WithMain)

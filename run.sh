@@ -1,1 +1,1 @@
-./build/hellotest
+./build/test/hellotest
