@@ -10,10 +10,10 @@ class AustraliaColors: public Space {
         AustraliaColors(void): vars(*this, 7, 0, 2){
             IntVar  wa(vars[0]), nt(vars[1]), sa(vars[2]), q(vars[3])
                  , nsw(vars[4]),  v(vars[5]),  t(vars[6]); 
-            // rel(*this,  wa, IRT_EQ,   0);
-            // rel(*this,  nt, IRT_EQ,   0);
-            rel(*this,  wa, IRT_EQ,  nt); 
-            rel(*this,  wa, IRT_NQ,  nt); 
+            rel(*this,  wa, IRT_EQ,   0);
+            rel(*this,  wa, IRT_EQ,   1);
+            // rel(*this,  wa, IRT_EQ,  nt); 
+            rel(*this,  wa, IRT_NQ,  nt);
             rel(*this,  wa, IRT_NQ,  sa); 
             rel(*this,  nt, IRT_NQ,  sa); 
             rel(*this,  nt, IRT_NQ,   q); 
@@ -22,6 +22,7 @@ class AustraliaColors: public Space {
             rel(*this, nsw, IRT_NQ,  sa); 
             rel(*this, nsw, IRT_NQ,   v); 
             rel(*this,   v, IRT_NQ,  sa);
+            branch(*this, vars, INT_VAR_SIZE_MIN(), INT_VAL_MIN());
         }
         virtual Space* copy(){
             return new AustraliaColors(*this);
@@ -35,7 +36,13 @@ class AustraliaColors: public Space {
 int main(){
     AustraliaColors* ac = new AustraliaColors();
     ac -> print();
-    ac -> status();
+    if(ac -> status() == SS_FAILED){
+        std::cout << "failed" << std::endl;
+    } else if(ac -> status() == SS_BRANCH){
+        std::cout << "branch" << std::endl;
+    } else if(ac -> status() == SS_SOLVED){
+        std::cout << "solved" << std::endl;
+    }
     ac -> print();
     delete ac;
     return 0;
