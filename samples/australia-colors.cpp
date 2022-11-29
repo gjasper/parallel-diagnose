@@ -10,8 +10,9 @@ class AustraliaColors: public Space {
         AustraliaColors(void): vars(*this, 7, 0, 2){
             IntVar  wa(vars[0]), nt(vars[1]), sa(vars[2]), q(vars[3])
                  , nsw(vars[4]),  v(vars[5]),  t(vars[6]); 
-            rel(*this,  wa, IRT_EQ,   0);
-            rel(*this,  nt, IRT_EQ,   1);
+            // rel(*this,  wa, IRT_EQ,   0);
+            // rel(*this,  nt, IRT_EQ,   0);
+            rel(*this,  wa, IRT_EQ,  nt); 
             rel(*this,  wa, IRT_NQ,  nt); 
             rel(*this,  wa, IRT_NQ,  sa); 
             rel(*this,  nt, IRT_NQ,  sa); 
