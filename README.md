@@ -14,7 +14,7 @@ g++ -o send-more-money -L<dir>/lib send-more-money.o \
 
 ## Dependencies 
 
-Gecode can be installed follow steps in [2].
+Gecode can be installed following the steps provided in [2].
 
 Some testes may require Catch2, which can be found at [3] or obtained from some package manager.
 
