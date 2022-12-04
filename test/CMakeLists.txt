@@ -1,3 +1,4 @@
 find_package(Catch2)
-add_executable(hellotest hellotest.cpp)
-target_link_libraries(hellotest PRIVATE Catch2::Catch2WithMain)
+add_executable(color_diagnose_test color_diagnose_test.cpp)
+target_link_libraries(color_diagnose_test PRIVATE Catch2::Catch2WithMain)
+target_link_libraries(color_diagnose_test PRIVATE diagnose)

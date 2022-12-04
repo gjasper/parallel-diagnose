@@ -1,5 +1,9 @@
 #include <catch2/catch.hpp>
 
+static int zero(){
+    return 0;
+}
+
 TEST_CASE(){
-    REQUIRE (true == true);
+    REQUIRE (zero() == 0);
 }

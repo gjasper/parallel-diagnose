@@ -1,4 +1,5 @@
 cmake_minimum_required(VERSION 3.22.1)
 project(parallel-diagnose)
+add_subdirectory(diagnose)
 add_subdirectory(test)
 add_subdirectory(samples)

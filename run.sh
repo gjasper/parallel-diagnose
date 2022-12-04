@@ -1,2 +1,2 @@
-./build/test/hellotest
+./build/test/color_diagnose_test
 ./build/samples/australia
