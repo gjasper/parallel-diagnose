@@ -1,1 +1,1 @@
-./build/test/color_diagnose_test
+./build/test/australia_colors_conflict_test

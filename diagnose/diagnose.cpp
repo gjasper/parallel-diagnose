@@ -1,24 +1,26 @@
 #include "diagnose.hpp"
 
-Constraint::Constraint(std::string name, int value){
+Constraint::Constraint(std::string cname, std::string var, int value){
     type = 0;
-    varName = name;
+    name = cname;
+    varName = var;
     rhsLiteralValue = value;
 }
 
-Constraint::Constraint(std::string a, std::string b){
+Constraint::Constraint(std::string cname, std::string a, std::string b){
     type = 1;
+    name = cname;
     varName = a;
     rhsVarname = b;
 }
 
 ColorModelBuilder ColorModelBuilder::withNeighbours(std::string a, std::string b) {
-    constraints.push_back(Constraint(a, b));
+    constraints.push_back(Constraint("c" + constraints.size(), a, b));
     return *this;
 }
 
 ColorModelBuilder ColorModelBuilder::withReq(std::string var, int color) {
-    constraints.push_back(Constraint(var, color));
+    constraints.push_back(Constraint("c" + constraints.size(), var, color));
     return *this;
 }
 
@@ -77,10 +79,12 @@ std::string ColorModelBuilder::propagate(std::list<Constraint> cs){
 }
 
 bool ColorModelBuilder::isConsistent(std::list<Constraint> ac){
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    std::cout << "passing by a consistency check" << std::endl;
     return propagate(ac) != "CONTRADICTION";
 }
 
-std::string ColorModelBuilder::findConflicts(){
+std::string ColorModelBuilder::findConflict(){
     std::string result;
     std::list<Constraint> ccs = qx(constraints);    
     std::vector<Constraint> conflictingConstraints{ std::begin(ccs), std::end(ccs) };
@@ -98,6 +102,7 @@ std::string ColorModelBuilder::findConflicts(){
 }
 
 std::list<Constraint> ColorModelBuilder::qx(std::list<Constraint> ac){
+    std::cout << std::endl << "starting qx" << std::endl;
     if(ac.empty()){
         return ac;
     } else {
@@ -130,4 +135,8 @@ std::list<Constraint> ColorModelBuilder::combine(const std::list<Constraint> lhs
         l.push_back(r.at(i));
     }
     return l;
+}
+
+std::string ColorModelBuilder::findDiagnose(){
+    return "TODO: implement FastDiag";
 }

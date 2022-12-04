@@ -22,7 +22,17 @@ TEST_CASE(){
     ColorModelBuilder builder = setup();
     builder.withReq("wa", 0);
     builder.withReq("nt", 0);
-    REQUIRE (builder.findConflicts() == " | wa != nt | wa == 0 | nt == 0 | ");
+    REQUIRE (builder.findConflict() == " | wa != nt | wa == 0 | nt == 0 | ");
+}
+
+TEST_CASE(){
+    ColorModelBuilder builder = setup();
+    builder.withReq("wa", 0);
+    builder.withReq("nt", 0);
+    builder.withReq("q", 2);
+    builder.withReq("nsw", 2);
+    builder.withReq("t", 0);
+    REQUIRE (builder.findDiagnose() == " | wa != nt | nsw != q | ");
 }
 
 ColorModelBuilder setup() {
