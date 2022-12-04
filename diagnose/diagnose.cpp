@@ -38,34 +38,34 @@ ColorModel::ColorModel(
         std::list<std::string> vs
     ,   std::list<Constraint> cs
     ,   int colorQtt) {
-
     vars = Gecode::IntVarArray(*this, vs.size(), 0, colorQtt - 1);
-
     std::vector<std::string> variables{ std::begin(vs), std::end(vs) };
     std::map<std::string, Gecode::IntVar> varMap;
     for(int i = 0; i < vs.size(); i++){
         varMap[variables.at(i)] = vars[i];
     }
-
-    std::vector<Constraint> constraints{ std::begin(cs), std::end(cs) };
-    for(int i = 0; i < constraints.size(); i++){
-        Constraint c = constraints.at(i);
+    std::vector<Constraint> constrs{ std::begin(cs), std::end(cs) };
+    for(int i = 0; i < constrs.size(); i++){
+        Constraint c = constrs.at(i);
         if(c.type == 1){
             rel(*this, varMap.at(c.varName), Gecode::IRT_NQ, varMap.at(c.rhsVarname));
         } else{
             rel(*this, varMap.at(c.varName), Gecode::IRT_EQ, c.rhsLiteralValue);
         }
     }
-
     branch(*this, vars, Gecode::INT_VAR_SIZE_MIN(), Gecode::INT_VAL_MIN());
 }
 
-ColorModel* ColorModelBuilder::build(){
-    return new ColorModel(vars, constraints, colorQtt);
+ColorModel* ColorModelBuilder::build(std::list<Constraint> cs){
+    return new ColorModel(vars, cs, colorQtt);
 }
 
 std::string ColorModelBuilder::propagate(){
-    ColorModel* ac = build();
+    return propagate(constraints);
+}
+
+std::string ColorModelBuilder::propagate(std::list<Constraint> cs){
+    ColorModel* ac = build(cs);
     if(ac -> status() == Gecode::SS_FAILED){
         return "CONTRADICTION";
     } else if(ac -> status() == Gecode::SS_BRANCH){
@@ -76,14 +76,58 @@ std::string ColorModelBuilder::propagate(){
     return "INVALID";
 }
 
-std::string ColorModelBuilder::findConflicts(int mode){
-    return "findConflicts return";
+bool ColorModelBuilder::isConsistent(std::list<Constraint> ac){
+    return propagate(ac) != "CONTRADICTION";
 }
 
-std::list<int> quickXplain(){
-
+std::string ColorModelBuilder::findConflicts(){
+    std::string result;
+    std::list<Constraint> ccs = qx(constraints);    
+    std::vector<Constraint> conflictingConstraints{ std::begin(ccs), std::end(ccs) };
+    for(int i = 0; i < conflictingConstraints.size(); i++){
+        result += " | ";
+        Constraint c = conflictingConstraints.at(i);
+        if(c.type == 1){
+            result += c.varName + " != " + c.rhsVarname;
+        } else {
+            result += c.varName + " == " + std::to_string(c.rhsLiteralValue);
+        }
+    }
+    result += " | ";
+    return result;
 }
 
-std::list<int> qx(){
+std::list<Constraint> ColorModelBuilder::qx(std::list<Constraint> ac){
+    if(ac.empty()){
+        return ac;
+    } else {
+        return qx(std::list<Constraint>(), ac, std::list<Constraint>());
+    }
+}
 
+std::list<Constraint> ColorModelBuilder::qx(std::list<Constraint> d, std::list<Constraint> c, std::list<Constraint> b){
+    if(!d.empty() && !isConsistent(b)){
+        return std::list<Constraint>();
+    }
+    if(c.size() == 1){
+        return c;
+    }
+    auto middle = std::next(c.begin(), c.size() / 2);
+    std::list<Constraint> c1( c.begin(), middle );
+    std::list<Constraint> c2( middle, c.end() );
+    std::list<Constraint> bc2 = combine(b, c2);
+    std::list<Constraint> cs1 = qx(c2, c1, bc2); 
+    std::list<Constraint> bcs1 = combine(b, cs1); 
+    std::list<Constraint> cs2 = qx(cs1, c2, bcs1);
+    std::list<Constraint> cs1cs2 = combine(cs1, cs2);
+    return cs1cs2;
+}
+
+std::list<Constraint> ColorModelBuilder::combine(const std::list<Constraint> lhs, const std::list<Constraint> rhs){
+    std::list<Constraint> l = lhs;
+    std::vector<Constraint> r{ std::begin(rhs), std::end(rhs) };
+    for(int i = 0; i < r.size(); i++){
+        l.push_back(r.at(i));
+    }
+    return l;
 }

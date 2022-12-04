@@ -1,10 +1,6 @@
 #include <catch2/catch.hpp>
 #include <diagnose.hpp>
 
-const int KB = 0;
-const int REQ = 1;
-const int KB_AND_REQ = 2;
-
 ColorModelBuilder setup();
 
 TEST_CASE(){
@@ -26,21 +22,7 @@ TEST_CASE(){
     ColorModelBuilder builder = setup();
     builder.withReq("wa", 0);
     builder.withReq("nt", 0);
-    REQUIRE (builder.findConflicts(REQ) == "wa = 0, nt = 0");
-}
-
-TEST_CASE(){
-    ColorModelBuilder builder = setup();
-    builder.withReq("wa", 0);
-    builder.withReq("nt", 0);
-    REQUIRE (builder.findConflicts(KB) == "");
-}
-
-TEST_CASE(){
-    ColorModelBuilder builder = setup();
-    builder.withReq("wa", 0);
-    builder.withReq("nt", 0);
-    REQUIRE (builder.findConflicts(KB_AND_REQ) == "wa = 0, nt = 0, wa != nt");
+    REQUIRE (builder.findConflicts() == " | wa != nt | wa == 0 | nt == 0 | ");
 }
 
 ColorModelBuilder setup() {
@@ -53,11 +35,11 @@ ColorModelBuilder setup() {
     builder.withVar("t");
     builder.withVar("v");
     builder.withColorQtt(3);
-    builder.withNeighbours("wa", "nt");
     builder.withNeighbours("wa", "sa"); 
     builder.withNeighbours("nt", "sa"); 
     builder.withNeighbours("nt", "q"); 
     builder.withNeighbours("q", "sa"); 
+    builder.withNeighbours("wa", "nt");
     builder.withNeighbours("q", "nsw"); 
     builder.withNeighbours("nsw", "sa"); 
     builder.withNeighbours("nsw", "v"); 

@@ -4,7 +4,6 @@
 #include <map>
 #include <gecode/int.hh>
 
-
 class Constraint {
     public:
         int type;
@@ -34,13 +33,18 @@ class ColorModelBuilder {
         std::list<std::string> vars;
         std::list<Constraint> constraints;
         int colorQtt;
+        std::string propagate(std::list<Constraint>);
+        bool isConsistent(std::list<Constraint>);
+        std::list<Constraint> combine(std::list<Constraint>, std::list<Constraint>);
+        std::list<Constraint> qx(std::list<Constraint>);
+        std::list<Constraint> qx(std::list<Constraint>, std::list<Constraint>, std::list<Constraint>);
     public:
         ColorModelBuilder();
-        ColorModel* build();
+        ColorModel* build(std::list<Constraint>);
         ColorModelBuilder withReq(std::string, int);
         ColorModelBuilder withNeighbours(std::string, std::string);
         ColorModelBuilder withVar(std::string);
         ColorModelBuilder withColorQtt(int);
         std::string propagate();
-        std::string findConflicts(int);
+        std::string findConflicts();
 };
