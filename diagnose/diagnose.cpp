@@ -1,7 +1,24 @@
 #include "diagnose.hpp"
 
+Constraint::Constraint(std::string name, int value){
+    type = 0;
+    varName = name;
+    rhsLiteralValue = value;
+}
+
+Constraint::Constraint(std::string a, std::string b){
+    type = 1;
+    varName = a;
+    rhsVarname = b;
+}
+
+ColorModelBuilder ColorModelBuilder::withNeighbours(std::string a, std::string b) {
+    constraints.push_back(Constraint(a, b));
+    return *this;
+}
+
 ColorModelBuilder ColorModelBuilder::withReq(std::string var, int color) {
-    reqs.push_back(make_tuple(var, color));
+    constraints.push_back(Constraint(var, color));
     return *this;
 }
 
@@ -15,17 +32,11 @@ ColorModelBuilder ColorModelBuilder::withColorQtt(int qtt) {
     return *this;
 }
 
-ColorModelBuilder ColorModelBuilder::withNeighbours(std::string a, std::string b) {
-    neighbours.push_back(make_tuple(a, b));
-    return *this;
-}
-
 ColorModelBuilder::ColorModelBuilder() {}
 
 ColorModel::ColorModel(
         std::list<std::string> vs
-    ,   std::list<std::tuple<std::string, int>> rs
-    ,   std::list<std::tuple<std::string, std::string>> ns
+    ,   std::list<Constraint> cs
     ,   int colorQtt) {
 
     vars = Gecode::IntVarArray(*this, vs.size(), 0, colorQtt - 1);
@@ -36,24 +47,21 @@ ColorModel::ColorModel(
         varMap[variables.at(i)] = vars[i];
     }
 
-    std::cout << std::endl;
-    std::vector<std::tuple<std::string, std::string>> neighbours{ std::begin(ns), std::end(ns) };
-    for(int i = 0; i < neighbours.size(); i++){
-        rel(*this, varMap.at(std::get<0>(neighbours.at(i))), Gecode::IRT_NQ, varMap.at(std::get<1>(neighbours.at(i))));
-        std::cout << std::get<0>(neighbours.at(i)) << " nq " << std::get<1>(neighbours.at(i)) << std::endl;
+    std::vector<Constraint> constraints{ std::begin(cs), std::end(cs) };
+    for(int i = 0; i < constraints.size(); i++){
+        Constraint c = constraints.at(i);
+        if(c.type == 1){
+            rel(*this, varMap.at(c.varName), Gecode::IRT_NQ, varMap.at(c.rhsVarname));
+        } else{
+            rel(*this, varMap.at(c.varName), Gecode::IRT_EQ, c.rhsLiteralValue);
+        }
     }
 
-    std::cout << std::endl;
-    std::vector<std::tuple<std::string, int>> reqs{ std::begin(rs), std::end(rs) };
-    for(int i = 0; i < reqs.size(); i++){
-        rel(*this, varMap.at(std::get<0>(reqs.at(i))), Gecode::IRT_EQ, std::get<1>(reqs.at(i)));
-        std::cout << std::get<0>(reqs.at(i)) << " eq " << std::get<1>(reqs.at(i)) << std::endl;
-    }
     branch(*this, vars, Gecode::INT_VAR_SIZE_MIN(), Gecode::INT_VAL_MIN());
 }
 
 ColorModel* ColorModelBuilder::build(){
-    return new ColorModel(vars, reqs, neighbours, colorQtt);
+    return new ColorModel(vars, constraints, colorQtt);
 }
 
 std::string ColorModelBuilder::propagate(){
@@ -70,4 +78,12 @@ std::string ColorModelBuilder::propagate(){
 
 std::string ColorModelBuilder::findConflicts(int mode){
     return "findConflicts return";
+}
+
+std::list<int> quickXplain(){
+
+}
+
+std::list<int> qx(){
+
 }

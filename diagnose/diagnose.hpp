@@ -2,8 +2,18 @@
 #include <list>
 #include <vector>
 #include <map>
-#include <tuple>
 #include <gecode/int.hh>
+
+
+class Constraint {
+    public:
+        int type;
+        std::string varName;
+        std::string rhsVarname;
+        int rhsLiteralValue;
+        Constraint(std::string, std::string);
+        Constraint(std::string, int);
+};
 
 class ColorModel: public Gecode::Space {
     protected:
@@ -11,13 +21,7 @@ class ColorModel: public Gecode::Space {
     public:
         ColorModel(
                 std::list<std::string>
-            ,   std::list<std::tuple<std::string, std::string>>
-            ,   int colorQtt
-            );
-        ColorModel(
-                std::list<std::string>
-            ,   std::list<std::tuple<std::string, int>>
-            ,   std::list<std::tuple<std::string, std::string>>
+            ,   std::list<Constraint> constraints
             ,   int colorQtt
             );
         virtual Space* copy(){
@@ -28,8 +32,7 @@ class ColorModel: public Gecode::Space {
 class ColorModelBuilder {
     private:
         std::list<std::string> vars;
-        std::list<std::tuple<std::string, std::string>> neighbours;
-        std::list<std::tuple<std::string, int>> reqs;
+        std::list<Constraint> constraints;
         int colorQtt;
     public:
         ColorModelBuilder();

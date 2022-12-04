@@ -22,26 +22,26 @@ TEST_CASE(){
     REQUIRE (builder.propagate() == "CONTRADICTION");
 }
 
-// TEST_CASE(){
-//     ColorModelBuilder builder = setup();
-//     builder.withReq("wa", 0);
-//     builder.withReq("nt", 0);
-//     REQUIRE (builder.findConflicts(REQ) == "wa = 0, nt = 0");
-// }
+TEST_CASE(){
+    ColorModelBuilder builder = setup();
+    builder.withReq("wa", 0);
+    builder.withReq("nt", 0);
+    REQUIRE (builder.findConflicts(REQ) == "wa = 0, nt = 0");
+}
 
-// TEST_CASE(){
-//     ColorModelBuilder builder = setup();
-//     builder.withReq("wa", 0);
-//     builder.withReq("nt", 0);
-//     REQUIRE (builder.findConflicts(KB) == "");
-// }
+TEST_CASE(){
+    ColorModelBuilder builder = setup();
+    builder.withReq("wa", 0);
+    builder.withReq("nt", 0);
+    REQUIRE (builder.findConflicts(KB) == "");
+}
 
-// TEST_CASE(){
-//     ColorModelBuilder builder = setup();
-//     builder.withReq("wa", 0);
-//     builder.withReq("nt", 0);
-//     REQUIRE (builder.findConflicts(KB_AND_REQ) == "wa = 0, nt = 0, wa != nt");
-// }
+TEST_CASE(){
+    ColorModelBuilder builder = setup();
+    builder.withReq("wa", 0);
+    builder.withReq("nt", 0);
+    REQUIRE (builder.findConflicts(KB_AND_REQ) == "wa = 0, nt = 0, wa != nt");
+}
 
 ColorModelBuilder setup() {
     ColorModelBuilder builder;
