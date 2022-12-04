@@ -29,6 +29,9 @@ class ColorModel: public Gecode::Space {
         virtual Space* copy(){
             return new ColorModel(*this);
         }
+        void print(void) const {
+            std :: cout << vars << std::endl;
+        }
 };
 
 class ColorModelBuilder {
@@ -50,7 +53,9 @@ class ColorModelBuilder {
         ColorModelBuilder withReq(std::string, int);
         ColorModelBuilder withNeighbours(std::string, std::string);
         ColorModelBuilder withVar(std::string);
+        ColorModelBuilder withVars(std::list<std::string>);
         ColorModelBuilder withColorQtt(int);
+        bool solve();
         std::string propagate();
         std::string findConflict();
         std::string findDiagnose();

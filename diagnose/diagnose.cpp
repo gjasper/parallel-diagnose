@@ -24,6 +24,11 @@ ColorModelBuilder ColorModelBuilder::withReq(std::string var, int color) {
     return *this;
 }
 
+ColorModelBuilder ColorModelBuilder::withVars(std::list<std::string> vs) {
+    vars = vs;
+    return *this;
+}
+
 ColorModelBuilder ColorModelBuilder::withVar(std::string var) {
     vars.push_back(var);
     return *this;
@@ -66,6 +71,15 @@ std::string ColorModelBuilder::propagate(){
     return propagate(constraints);
 }
 
+bool ColorModelBuilder::solve(){
+    ColorModel* m = build(constraints);
+    Gecode::DFS<ColorModel> e(m);
+    if(ColorModel* solution = e.next()){
+        return true;
+    } else {
+        return false;
+    }
+}
 std::string ColorModelBuilder::propagate(std::list<Constraint> cs){
     ColorModel* ac = build(cs);
     if(ac -> status() == Gecode::SS_FAILED){

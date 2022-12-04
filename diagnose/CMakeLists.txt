@@ -1,5 +1,5 @@
 include_directories(/usr/local/include/gecode)
 link_directories(/usr/local/lib/gecode)
 add_library(diagnose diagnose.cpp)
-target_link_libraries(diagnose gecodekernel gecodeint gecodesupport)
+target_link_libraries(diagnose gecodesearch gecodekernel gecodeint gecodesupport)
 target_include_directories(diagnose PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}") 

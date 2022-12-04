@@ -1,4 +1,9 @@
 find_package(Catch2)
+
 add_executable(australia_colors_conflict_test australia_colors_conflict_test.cpp)
 target_link_libraries(australia_colors_conflict_test PRIVATE Catch2::Catch2WithMain)
 target_link_libraries(australia_colors_conflict_test PRIVATE diagnose)
+
+add_executable(usa_colors_conflict_test usa_colors_conflict_test.cpp)
+target_link_libraries(usa_colors_conflict_test PRIVATE Catch2::Catch2WithMain)
+target_link_libraries(usa_colors_conflict_test PRIVATE diagnose)
