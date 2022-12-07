@@ -58,5 +58,11 @@ class ColorModelBuilder {
         bool solve();
         std::string propagate();
         std::string findConflict();
+        std::string findDiagnose(int){
+            return "";
+        }
         std::string findDiagnose();
+        std::string printConstraints(std::list<Constraint>);
 };
+
+bool contains(std::string, std::list<std::string>);

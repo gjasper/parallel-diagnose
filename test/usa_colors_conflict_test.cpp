@@ -2,6 +2,7 @@
 #include <diagnose.hpp>
 
 ColorModelBuilder setup();
+void assertSolution(std::string);
 
 TEST_CASE(){
     ColorModelBuilder builder = setup();
@@ -25,6 +26,32 @@ TEST_CASE(){
     builder.withReq("AK", 0);
     builder.withReq("WA", 0);
     REQUIRE (builder.findConflict() == " | AK != WA | AK == 0 | WA == 0 | ");
+}
+
+TEST_CASE(){
+    ColorModelBuilder builder = setup();
+    builder.withReq("AK", 0);
+    builder.withReq("WA", 0);
+    builder.withReq("CO", 0);
+    builder.withReq("KS", 0);
+    assertSolution(builder.findDiagnose());
+}
+
+TEST_CASE(){
+    ColorModelBuilder builder = setup();
+    builder.withReq("AK", 0);
+    builder.withReq("WA", 0);
+    builder.withReq("CO", 0);
+    builder.withReq("KS", 0);
+    assertSolution(builder.findDiagnose(1)); 
+    assertSolution(builder.findDiagnose(2));
+}
+
+void assertSolution(std::string solution){
+    bool solves1stConflict = contains(solution, {"| AK != WA |", "| AK == 0 |", "| WA == 0 |"});
+    bool solves2ndConflict = contains(solution, {"| CO != KS |", "| CO == 0 |", "| KS == 0 |"});
+    REQUIRE (solves1stConflict);
+    REQUIRE (solves2ndConflict);
 }
 
 ColorModelBuilder setup() {

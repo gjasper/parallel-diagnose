@@ -93,15 +93,18 @@ std::string ColorModelBuilder::propagate(std::list<Constraint> cs){
 }
 
 bool ColorModelBuilder::isConsistent(std::list<Constraint> ac){
-    std::this_thread::sleep_for(std::chrono::milliseconds(100));
-    std::cout << "passing by a consistency check" << std::endl;
+    // std::this_thread::sleep_for(std::chrono::milliseconds(100));
     return propagate(ac) != "CONTRADICTION";
 }
 
 std::string ColorModelBuilder::findConflict(){
+    std::list<Constraint> conflictingConstraints = qx(constraints);  
+    return printConstraints(conflictingConstraints);  
+}
+
+std::string ColorModelBuilder::printConstraints(const std::list<Constraint> cs){
     std::string result;
-    std::list<Constraint> ccs = qx(constraints);    
-    std::vector<Constraint> conflictingConstraints{ std::begin(ccs), std::end(ccs) };
+    std::vector<Constraint> conflictingConstraints{ std::begin(cs), std::end(cs) };
     for(int i = 0; i < conflictingConstraints.size(); i++){
         result += " | ";
         Constraint c = conflictingConstraints.at(i);
@@ -116,7 +119,6 @@ std::string ColorModelBuilder::findConflict(){
 }
 
 std::list<Constraint> ColorModelBuilder::qx(std::list<Constraint> ac){
-    std::cout << std::endl << "starting qx" << std::endl;
     if(ac.empty()){
         return ac;
     } else {
@@ -142,6 +144,50 @@ std::list<Constraint> ColorModelBuilder::qx(std::list<Constraint> d, std::list<C
     return cs1cs2;
 }
 
+std::string ColorModelBuilder::findDiagnose(){
+    std::list<Constraint> conflictingConstraints = fd(constraints);  
+    return printConstraints(conflictingConstraints);  
+}
+
+std::list<Constraint> ColorModelBuilder::fd(std::list<Constraint> ac){
+    if(ac.empty()){
+        return ac;
+    } else {
+        return fd(std::list<Constraint>(), ac, ac);
+    }
+}
+
+std::list<Constraint> ColorModelBuilder::fd(std::list<Constraint> d, std::list<Constraint> c, std::list<Constraint> ac){
+    if(!d.empty() && isConsistent(ac)){
+        return std::list<Constraint>();
+    }
+    if(c.size() == 1){
+        return c;
+    }
+    auto middle = std::next(c.begin(), c.size() / 2);
+    std::list<Constraint> c1( c.begin(), middle );
+    std::list<Constraint> c2( middle, c.end() );
+    std::list<Constraint> acMinusC2 = subtract(ac, c2);
+    std::list<Constraint> d1 = fd(c2, c1, acMinusC2); 
+    std::list<Constraint> acMinusD1 = subtract(ac, d1); 
+    std::list<Constraint> d2 = fd(d1, c2, acMinusD1);
+    std::list<Constraint> d1d2 = combine(d1, d2);
+    return d1d2;
+}
+
+std::list<Constraint> ColorModelBuilder::subtract(const std::list<Constraint> lhs, const std::list<Constraint> rhs){
+    std::list<Constraint> l;
+    std::list<std::string> r;
+    std::transform(rhs.begin(), rhs.end(), std::back_inserter(r), [](Constraint c){return c.name;});
+    auto pred = [r](Constraint constraint) { 
+        return !std::any_of(r.begin(), r.end(), [constraint](std::string name_from_r){ 
+            return name_from_r == constraint.name; 
+        });
+    };
+    std::copy_if(lhs.begin(), lhs.end(), std::back_inserter(l), pred);
+    return l;
+}
+
 std::list<Constraint> ColorModelBuilder::combine(const std::list<Constraint> lhs, const std::list<Constraint> rhs){
     std::list<Constraint> l = lhs;
     std::vector<Constraint> r{ std::begin(rhs), std::end(rhs) };
@@ -151,6 +197,12 @@ std::list<Constraint> ColorModelBuilder::combine(const std::list<Constraint> lhs
     return l;
 }
 
-std::string ColorModelBuilder::findDiagnose(){
-    return "TODO: implement FastDiag";
+bool contains (const std::string s, const std::list<std::string> items){
+    bool found = false;
+    for(auto item : items){
+        if(s.find(item) != std::string::npos){
+            return true;
+        }
+    }
+    return false;
 }

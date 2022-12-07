@@ -2,6 +2,7 @@
 #include <diagnose.hpp>
 
 ColorModelBuilder setup();
+void assertSolution(std::string);
 
 TEST_CASE(){
     ColorModelBuilder builder = setup();
@@ -32,7 +33,14 @@ TEST_CASE(){
     builder.withReq("q", 2);
     builder.withReq("nsw", 2);
     builder.withReq("t", 0);
-    REQUIRE (builder.findDiagnose() == " | wa != nt | nsw != q | ");
+    assertSolution(builder.findDiagnose()); 
+}
+
+void assertSolution(std::string solution){
+    bool solves1stConflict = contains(solution, {"| wa != nt |", "| wa == 0 |", "| nt == 0 |"});
+    bool solves2ndConflict = contains(solution, {"| q != nsw |", "| q == 2 |", "| nsw == 2 |"});
+    REQUIRE (solves1stConflict);
+    REQUIRE (solves2ndConflict);
 }
 
 ColorModelBuilder setup() {
