@@ -39,6 +39,14 @@ ColorModelBuilder ColorModelBuilder::withColorQtt(int qtt) {
     return *this;
 }
 
+std::string Constraint::toString() const {
+    if(type == 1){
+        return varName + " != " + rhsVarname;
+    } else {
+        return varName + " == " + std::to_string(rhsLiteralValue);
+    }
+}
+
 ColorModelBuilder::ColorModelBuilder() {}
 
 ColorModel::ColorModel(
@@ -80,6 +88,7 @@ bool ColorModelBuilder::solve(){
         return false;
     }
 }
+
 std::string ColorModelBuilder::propagate(std::list<Constraint> cs){
     ColorModel* ac = build(cs);
     if(ac -> status() == Gecode::SS_FAILED){
@@ -99,20 +108,23 @@ bool ColorModelBuilder::isConsistent(std::list<Constraint> ac){
 
 std::string ColorModelBuilder::findConflict(){
     std::list<Constraint> conflictingConstraints = qx(constraints);  
-    return printConstraints(conflictingConstraints);  
+    return toString(conflictingConstraints);  
 }
 
-std::string ColorModelBuilder::printConstraints(const std::list<Constraint> cs){
+std::list<std::string> ColorModelBuilder::toStringList(const std::list<std::list<Constraint>> solutions){
+    std::list<std::string> s_solutions;
+    std::transform(solutions.begin(), solutions.end(), back_inserter(s_solutions), [this](std::list<Constraint> cs){
+        return toString(cs);
+    });
+    return s_solutions;
+}
+
+std::string ColorModelBuilder::toString(const std::list<Constraint> cs){
     std::string result;
     std::vector<Constraint> conflictingConstraints{ std::begin(cs), std::end(cs) };
     for(int i = 0; i < conflictingConstraints.size(); i++){
         result += " | ";
-        Constraint c = conflictingConstraints.at(i);
-        if(c.type == 1){
-            result += c.varName + " != " + c.rhsVarname;
-        } else {
-            result += c.varName + " == " + std::to_string(c.rhsLiteralValue);
-        }
+        result += conflictingConstraints.at(i).toString();
     }
     result += " | ";
     return result;
@@ -144,9 +156,36 @@ std::list<Constraint> ColorModelBuilder::qx(std::list<Constraint> d, std::list<C
     return cs1cs2;
 }
 
-std::string ColorModelBuilder::findDiagnose(){
-    std::list<Constraint> conflictingConstraints = fd(constraints);  
-    return printConstraints(conflictingConstraints);  
+std::list<std::string> ColorModelBuilder::findDiagnoses(){
+    return toStringList(hsDAG(constraints));  
+    // return {toString(fd(constraints))};
+}
+
+std::list<std::list<Constraint>> ColorModelBuilder::hsDAG(std::list<Constraint> ac){
+    std::queue<std::list<Constraint>> queue;
+    queue.push(std::list<Constraint>());
+    std::list<std::list<Constraint>> visited;
+    std::list<std::list<Constraint>> diags;
+    while(!queue.empty()){
+        std::list<Constraint> path = queue.front();
+        queue.pop();
+        std::list<Constraint> diag = fd(subtract(ac, path));
+        if(!diag.empty() && !contains(toStringList(diags), toString(diag))){
+            diags.push_back(diag);
+        }
+        for(Constraint c : diag){
+            std::list<Constraint> newPath = path;
+            newPath.push_back(c);
+            newPath.sort([](const Constraint &a, const Constraint &b) {
+                return a.toString() > b.toString();
+            });
+            if(!contains(toStringList(visited), toString(newPath))){
+                queue.push(newPath);
+                visited.push_back(newPath);
+            }
+        }
+    }
+    return diags;
 }
 
 std::list<Constraint> ColorModelBuilder::fd(std::list<Constraint> ac){
@@ -197,7 +236,7 @@ std::list<Constraint> ColorModelBuilder::combine(const std::list<Constraint> lhs
     return l;
 }
 
-bool contains (const std::string s, const std::list<std::string> items){
+bool contains (const std::list<std::string> items, const std::string s){
     bool found = false;
     for(auto item : items){
         if(s.find(item) != std::string::npos){

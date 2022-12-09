@@ -1,4 +1,4 @@
-This project implements the MergeXplain algorithm proposed in [1] using gecode as the constraint solver.
+This project implements the level wise parallelization diagnosis from [1] using gecode as the constraint solver.
 
 ## Sample Problems
 

@@ -3,7 +3,9 @@
 #include <vector>
 #include <map>
 #include <chrono>
+#include <algorithm>
 #include <thread>
+#include <queue>
 #include <gecode/int.hh>
 
 class Constraint {
@@ -15,6 +17,7 @@ class Constraint {
         int rhsLiteralValue;
         Constraint(std::string, std::string, std::string);
         Constraint(std::string, std::string, int);
+        std::string toString() const;
 };
 
 class ColorModel: public Gecode::Space {
@@ -43,6 +46,7 @@ class ColorModelBuilder {
         bool isConsistent(std::list<Constraint>);
         std::list<Constraint> combine(std::list<Constraint>, std::list<Constraint>);
         std::list<Constraint> subtract(std::list<Constraint>, std::list<Constraint>);
+        std::list<std::list<Constraint>> hsDAG(std::list<Constraint>);
         std::list<Constraint> qx(std::list<Constraint>);
         std::list<Constraint> qx(std::list<Constraint>, std::list<Constraint>, std::list<Constraint>);
         std::list<Constraint> fd(std::list<Constraint>);
@@ -58,11 +62,17 @@ class ColorModelBuilder {
         bool solve();
         std::string propagate();
         std::string findConflict();
-        std::string findDiagnose(int){
-            return "";
+        std::string findDiagnose(){
+            return findDiagnose(1);
         }
-        std::string findDiagnose();
-        std::string printConstraints(std::list<Constraint>);
+        std::string findDiagnose(int i) {
+            std::list<std::string> diags = findDiagnoses();
+            std::vector<std::string> ds{ std::begin(diags), std::end(diags) };
+            return ds.at(i);
+        }
+        std::list<std::string> findDiagnoses();
+        std::string toString(std::list<Constraint>);
+        std::list<std::string> toStringList(std::list<std::list<Constraint>>);
 };
 
-bool contains(std::string, std::list<std::string>);
+bool contains(std::list<std::string>, std::string);
