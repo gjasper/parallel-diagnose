@@ -15,12 +15,12 @@ Constraint::Constraint(std::string cname, std::string a, std::string b){
 }
 
 ColorModelBuilder ColorModelBuilder::withNeighbours(std::string a, std::string b) {
-    constraints.push_back(Constraint("c" + constraints.size(), a, b));
+    constraints.push_back(Constraint("c" + std::to_string(constraints.size()), a, b));
     return *this;
 }
 
 ColorModelBuilder ColorModelBuilder::withReq(std::string var, int color) {
-    constraints.push_back(Constraint("c" + constraints.size(), var, color));
+    constraints.push_back(Constraint("c" + std::to_string(constraints.size()), var, color));
     return *this;
 }
 
@@ -45,6 +45,25 @@ std::string Constraint::toString() const {
     } else {
         return varName + " == " + std::to_string(rhsLiteralValue);
     }
+}
+
+std::list<std::string> ColorModelBuilder::toStringList(const std::list<std::list<Constraint>> solutions){
+    std::list<std::string> s_solutions;
+    std::transform(solutions.begin(), solutions.end(), back_inserter(s_solutions), [this](std::list<Constraint> cs){
+        return toString(cs);
+    });
+    return s_solutions;
+}
+
+std::string ColorModelBuilder::toString(const std::list<Constraint> cs){
+    std::string result;
+    std::vector<Constraint> conflictingConstraints{ std::begin(cs), std::end(cs) };
+    for(int i = 0; i < conflictingConstraints.size(); i++){
+        result += " | ";
+        result += conflictingConstraints.at(i).toString();
+    }
+    result += " | ";
+    return result;
 }
 
 ColorModelBuilder::ColorModelBuilder() {}
@@ -109,25 +128,6 @@ bool ColorModelBuilder::isConsistent(std::list<Constraint> ac){
 std::string ColorModelBuilder::findConflict(){
     std::list<Constraint> conflictingConstraints = qx(constraints);  
     return toString(conflictingConstraints);  
-}
-
-std::list<std::string> ColorModelBuilder::toStringList(const std::list<std::list<Constraint>> solutions){
-    std::list<std::string> s_solutions;
-    std::transform(solutions.begin(), solutions.end(), back_inserter(s_solutions), [this](std::list<Constraint> cs){
-        return toString(cs);
-    });
-    return s_solutions;
-}
-
-std::string ColorModelBuilder::toString(const std::list<Constraint> cs){
-    std::string result;
-    std::vector<Constraint> conflictingConstraints{ std::begin(cs), std::end(cs) };
-    for(int i = 0; i < conflictingConstraints.size(); i++){
-        result += " | ";
-        result += conflictingConstraints.at(i).toString();
-    }
-    result += " | ";
-    return result;
 }
 
 std::list<Constraint> ColorModelBuilder::qx(std::list<Constraint> ac){

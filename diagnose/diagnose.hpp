@@ -63,7 +63,7 @@ class ColorModelBuilder {
         std::string propagate();
         std::string findConflict();
         std::string findDiagnose(){
-            return findDiagnose(1);
+            return findDiagnose(0);
         }
         std::string findDiagnose(int i) {
             std::list<std::string> diags = findDiagnoses();
