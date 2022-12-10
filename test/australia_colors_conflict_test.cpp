@@ -37,8 +37,8 @@ TEST_CASE(){
 }
 
 void assertSolution(std::string solution){
-    bool solves1stConflict = contains({"| wa != nt |", "| wa == 0 |", "| nt == 0 |"}, solution);
-    bool solves2ndConflict = contains({"| q != nsw |", "| q == 2 |", "| nsw == 2 |"}, solution);
+    bool solves1stConflict = find({"| wa != nt |", "| wa == 0 |", "| nt == 0 |"}, solution);
+    bool solves2ndConflict = find({"| q != nsw |", "| q == 2 |", "| nsw == 2 |"}, solution);
     REQUIRE (solves1stConflict);
     REQUIRE (solves2ndConflict);
 }

@@ -41,24 +41,41 @@ TEST_CASE(){
     ColorModelBuilder builder = setup();
     builder.withReq("AK", 0);
     builder.withReq("WA", 0);
-    builder.withReq("CO", 0);
-    builder.withReq("KS", 0);
-    assertSolution(builder.findDiagnose(1)); 
-    assertSolution(builder.findDiagnose(2));
+    REQUIRE (builder.findDiagnose(0) == " | WA == 0 | ");
+    REQUIRE (builder.findDiagnose(1) == " | AK == 0 | ");
+    REQUIRE (builder.findDiagnose(2) == " | AK != WA | ");
 }
 
 TEST_CASE(){
     ColorModelBuilder builder = setup();
-    builder.withReq("AK", 0);
-    builder.withReq("WA", 0);
-    builder.withReq("CO", 0);
-    builder.withReq("KS", 0);
-    REQUIRE (builder.findDiagnoses().size() > 2);
+
+    builder.withReq("TX", 0);
+    builder.withReq("LA", 0);
+
+    builder.withReq("NY", 1);
+    builder.withReq("PA", 1);
+
+    builder.withReq("VA", 2);
+    builder.withReq("NC", 2);
+    builder.withReq("SC", 2);
+
+    builder.withReq("WA", 3);
+    builder.withReq("OR", 3);
+
+    builder.withReq("CA", 0);
+    builder.withReq("NV", 0);
+
+    builder.withReq("MT", 1);
+    builder.withReq("ND", 1);
+
+    std::list<std::string> solutions = builder.findDiagnoses();
+    int solutionsQtt = solutions.size();
+    REQUIRE (solutionsQtt > 1000);
 }
 
 void assertSolution(std::string solution){
-    bool solves1stConflict = contains({"| AK != WA |", "| AK == 0 |", "| WA == 0 |"}, solution);
-    bool solves2ndConflict = contains({"| CO != KS |", "| CO == 0 |", "| KS == 0 |"}, solution);
+    bool solves1stConflict = find({"| AK != WA |", "| AK == 0 |", "| WA == 0 |"}, solution);
+    bool solves2ndConflict = find({"| CO != KS |", "| CO == 0 |", "| KS == 0 |"}, solution);
     REQUIRE (solves1stConflict);
     REQUIRE (solves2ndConflict);
 }

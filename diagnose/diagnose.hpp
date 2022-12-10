@@ -50,6 +50,7 @@ class ColorModelBuilder {
         std::list<Constraint> qx(std::list<Constraint>);
         std::list<Constraint> qx(std::list<Constraint>, std::list<Constraint>, std::list<Constraint>);
         std::list<Constraint> fd(std::list<Constraint>);
+        std::list<Constraint> fd(std::list<Constraint>, std::list<Constraint>);
         std::list<Constraint> fd(std::list<Constraint>, std::list<Constraint>, std::list<Constraint>);
     public:
         ColorModelBuilder();
@@ -76,3 +77,4 @@ class ColorModelBuilder {
 };
 
 bool contains(std::list<std::string>, std::string);
+bool find(std::list<std::string>, std::string);

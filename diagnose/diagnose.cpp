@@ -164,12 +164,14 @@ std::list<std::string> ColorModelBuilder::findDiagnoses(){
 std::list<std::list<Constraint>> ColorModelBuilder::hsDAG(std::list<Constraint> ac){
     std::queue<std::list<Constraint>> queue;
     queue.push(std::list<Constraint>());
-    std::list<std::list<Constraint>> visited;
+    std::list<std::string> visited;
     std::list<std::list<Constraint>> diags;
+    // std::cout << "starting hsDAG" << std::endl; 
     while(!queue.empty()){
         std::list<Constraint> path = queue.front();
+        // std::cout << "queue size: " << queue.size() << std::endl; 
         queue.pop();
-        std::list<Constraint> diag = fd(subtract(ac, path));
+        std::list<Constraint> diag = fd(subtract(ac, path), ac);
         if(!diag.empty() && !contains(toStringList(diags), toString(diag))){
             diags.push_back(diag);
         }
@@ -179,20 +181,21 @@ std::list<std::list<Constraint>> ColorModelBuilder::hsDAG(std::list<Constraint> 
             newPath.sort([](const Constraint &a, const Constraint &b) {
                 return a.toString() > b.toString();
             });
-            if(!contains(toStringList(visited), toString(newPath))){
+            std::string s_newPath = toString(newPath);
+            if(!contains(visited, s_newPath)){
                 queue.push(newPath);
-                visited.push_back(newPath);
+                visited.push_back(s_newPath);
             }
         }
     }
     return diags;
 }
 
-std::list<Constraint> ColorModelBuilder::fd(std::list<Constraint> ac){
-    if(ac.empty()){
-        return ac;
+std::list<Constraint> ColorModelBuilder::fd(std::list<Constraint> c, std::list<Constraint> ac){
+    if(c.empty() || !isConsistent(subtract(ac, c))){
+        return std::list<Constraint>();
     } else {
-        return fd(std::list<Constraint>(), ac, ac);
+        return fd(std::list<Constraint>(), c, ac);
     }
 }
 
@@ -206,10 +209,8 @@ std::list<Constraint> ColorModelBuilder::fd(std::list<Constraint> d, std::list<C
     auto middle = std::next(c.begin(), c.size() / 2);
     std::list<Constraint> c1( c.begin(), middle );
     std::list<Constraint> c2( middle, c.end() );
-    std::list<Constraint> acMinusC2 = subtract(ac, c2);
-    std::list<Constraint> d1 = fd(c2, c1, acMinusC2); 
-    std::list<Constraint> acMinusD1 = subtract(ac, d1); 
-    std::list<Constraint> d2 = fd(d1, c2, acMinusD1);
+    std::list<Constraint> d1 = fd(c2, c1, subtract(ac, c2));
+    std::list<Constraint> d2 = fd(d1, c2, subtract(ac, d1));
     std::list<Constraint> d1d2 = combine(d1, d2);
     return d1d2;
 }
@@ -236,10 +237,18 @@ std::list<Constraint> ColorModelBuilder::combine(const std::list<Constraint> lhs
     return l;
 }
 
-bool contains (const std::list<std::string> items, const std::string s){
-    bool found = false;
+bool find (const std::list<std::string> items, const std::string s){
     for(auto item : items){
         if(s.find(item) != std::string::npos){
+            return true;
+        }
+    }
+    return false;
+}
+
+bool contains (const std::list<std::string> items, const std::string s){
+    for(auto item : items){
+        if(item == s){
             return true;
         }
     }
