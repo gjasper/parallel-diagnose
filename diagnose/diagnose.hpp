@@ -2,10 +2,10 @@
 #include <list>
 #include <vector>
 #include <map>
-#include <chrono>
 #include <algorithm>
 #include <thread>
 #include <queue>
+#include <future>
 #include <gecode/int.hh>
 
 class Constraint {
@@ -47,6 +47,7 @@ class ColorModelBuilder {
         std::list<Constraint> combine(std::list<Constraint>, std::list<Constraint>);
         std::list<Constraint> subtract(std::list<Constraint>, std::list<Constraint>);
         std::list<std::list<Constraint>> hsDAG(std::list<Constraint>);
+        std::list<std::list<Constraint>> parallelHsDAG(std::list<Constraint>);
         std::list<Constraint> qx(std::list<Constraint>);
         std::list<Constraint> qx(std::list<Constraint>, std::list<Constraint>, std::list<Constraint>);
         std::list<Constraint> fd(std::list<Constraint>);
@@ -71,7 +72,10 @@ class ColorModelBuilder {
             std::vector<std::string> ds{ std::begin(diags), std::end(diags) };
             return ds.at(i);
         }
-        std::list<std::string> findDiagnoses();
+        std::list<std::string> findDiagnoses(){
+            return findDiagnoses(false);
+        }
+        std::list<std::string> findDiagnoses(bool);
         std::string toString(std::list<Constraint>);
         std::list<std::string> toStringList(std::list<std::list<Constraint>>);
 };

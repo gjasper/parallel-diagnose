@@ -156,9 +156,12 @@ std::list<Constraint> ColorModelBuilder::qx(std::list<Constraint> d, std::list<C
     return cs1cs2;
 }
 
-std::list<std::string> ColorModelBuilder::findDiagnoses(){
-    return toStringList(hsDAG(constraints));  
-    // return {toString(fd(constraints))};
+std::list<std::string> ColorModelBuilder::findDiagnoses(bool parallel){
+    if(parallel){
+        return toStringList(parallelHsDAG(constraints));  
+    } else{
+        return toStringList(hsDAG(constraints)); 
+    }
 }
 
 std::list<std::list<Constraint>> ColorModelBuilder::hsDAG(std::list<Constraint> ac){
@@ -253,4 +256,54 @@ bool contains (const std::list<std::string> items, const std::string s){
         }
     }
     return false;
+}
+
+class Node {
+    public:
+        std::list<Constraint> path;
+        std::list<Constraint> diag;
+
+        Node( std::list<Constraint> p, std::list<Constraint> d){
+            path = p;
+            diag = d;
+        }
+
+};
+
+std::list<std::list<Constraint>> ColorModelBuilder::parallelHsDAG(std::list<Constraint> ac){
+    std::queue<std::list<Constraint>> queue;
+    queue.push(std::list<Constraint>());
+    std::list<std::string> visited;
+    std::list<std::list<Constraint>> diags;
+    while(!queue.empty()){
+        std::list<std::future<Node>> nodes;
+        while(!queue.empty()){
+            std::list<Constraint> path = queue.front();
+            queue.pop();
+            nodes.push_back(std::async([this, path, ac](){
+                return Node(path, fd(subtract(ac, path), ac));
+            }));
+        }
+        for(std::future<Node> &futureNode : nodes){
+            Node node = futureNode.get();
+            std::list<Constraint> path = node.path;
+            std::list<Constraint> diag = node.diag;
+            if(!diag.empty() && !contains(toStringList(diags), toString(diag))){
+                diags.push_back(diag);
+            }
+            for(Constraint c : diag){
+                std::list<Constraint> newPath = path;
+                newPath.push_back(c);
+                newPath.sort([](const Constraint &a, const Constraint &b) {
+                    return a.toString() > b.toString();
+                });
+                std::string s_newPath = toString(newPath);
+                if(!contains(visited, s_newPath)){
+                    queue.push(newPath);
+                    visited.push_back(s_newPath);
+                }
+            }
+        }
+    }
+    return diags;
 }

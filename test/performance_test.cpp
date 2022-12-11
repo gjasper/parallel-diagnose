@@ -1,4 +1,5 @@
 #include <catch2/catch.hpp>
+#include <chrono>
 #include <diagnose.hpp>
 
 ColorModelBuilder setup();
@@ -6,51 +7,51 @@ void assertSolution(std::string);
 
 TEST_CASE(){
     ColorModelBuilder builder = setup();
-    REQUIRE (builder.solve() == true);
-}
 
-TEST_CASE(){
-    ColorModelBuilder builder = setup();
-    REQUIRE (builder.propagate() == "BRANCH");
-}
+    builder.withReq("TX", 0);
+    builder.withReq("LA", 0);
 
-TEST_CASE(){
-    ColorModelBuilder builder = setup();
-    builder.withReq("AK", 0);
-    builder.withReq("WA", 0);
-    REQUIRE (builder.propagate() == "CONTRADICTION");
-}
+    builder.withReq("NY", 1);
+    builder.withReq("PA", 1);
 
-TEST_CASE(){
-    ColorModelBuilder builder = setup();
-    builder.withReq("AK", 0);
-    builder.withReq("WA", 0);
-    REQUIRE (builder.findConflict() == " | AK != WA | AK == 0 | WA == 0 | ");
-}
+    builder.withReq("VA", 2);
+    builder.withReq("NC", 2);
+    builder.withReq("SC", 2);
 
-TEST_CASE(){
-    ColorModelBuilder builder = setup();
-    builder.withReq("AK", 0);
-    builder.withReq("WA", 0);
-    builder.withReq("CO", 0);
-    builder.withReq("KS", 0);
-    assertSolution(builder.findDiagnose());
-}
+    builder.withReq("WA", 3);
+    builder.withReq("OR", 3);
 
-TEST_CASE(){
-    ColorModelBuilder builder = setup();
-    builder.withReq("AK", 0);
-    builder.withReq("WA", 0);
-    REQUIRE (builder.findDiagnose(0) == " | WA == 0 | ");
-    REQUIRE (builder.findDiagnose(1) == " | AK == 0 | ");
-    REQUIRE (builder.findDiagnose(2) == " | AK != WA | ");
-}
+    builder.withReq("CA", 0);
+    builder.withReq("NV", 0);
 
-void assertSolution(std::string solution){
-    bool solves1stConflict = find({"| AK != WA |", "| AK == 0 |", "| WA == 0 |"}, solution);
-    bool solves2ndConflict = find({"| CO != KS |", "| CO == 0 |", "| KS == 0 |"}, solution);
-    REQUIRE (solves1stConflict);
-    REQUIRE (solves2ndConflict);
+    // builder.withReq("MT", 1);
+    // builder.withReq("ND", 1);
+
+    std::cout << "Running sequentially..." << std::endl;
+
+    auto start = std::chrono::high_resolution_clock::now();
+    std::list<std::string> solutions = builder.findDiagnoses();
+    auto stop = std::chrono::high_resolution_clock::now();
+    int sequentialSolutionsQtt = solutions.size();
+
+    std::cout   << "Sequential run is finished. Elapsed time: " 
+                << std::chrono::duration_cast<std::chrono::milliseconds>(stop - start).count()
+                << " milliseconds"
+                << std::endl;
+
+    std::cout << "Running in parallel..." << std::endl;
+    
+    start = std::chrono::high_resolution_clock::now();
+    solutions = builder.findDiagnoses(true);
+    stop = std::chrono::high_resolution_clock::now();
+    int parallelSolutionsQtt = solutions.size();
+
+    std::cout   << "Parallel run is finished.   Elapsed time: " 
+                << std::chrono::duration_cast<std::chrono::milliseconds>(stop - start).count()
+                << " milliseconds"
+                << std::endl;
+
+    REQUIRE (sequentialSolutionsQtt == parallelSolutionsQtt);
 }
 
 ColorModelBuilder setup() {
