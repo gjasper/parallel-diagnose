@@ -37,7 +37,7 @@ Em aplicações baseadas em resolução de restrições, com frequência ocorrem
 
 Configuradores de produto apresentam opções à um usuário baseado em um conjunto de restrições preparado por especialistas. Ao utlizar um configurador de produto, pode estar disponível ao usuário fazer escolhas que conflitam entre si. Também é possível que o especialista responsável por administrar as restrições do produto inicie uma atualização da base de restrições introduzindo uma mudança que não está em acordo com o modelo usado até então.
 
-A figura 1 ilustra um modelo de configurador de produto de um robô de faxina. No modelo é possível identificar características do produto que ficam disponíveis para escolha do usuário. Também é possível idenfiticar restrições entre os valores das caraterísticas.
+A figura 1 ilustra um modelo de configurador de produto de um robô de faxina. No modelo é possível identificar características do produto que ficam disponíveis para escolha do usuário. Também é possível identificar restrições entre os valores das caraterísticas.
 
 \begin{figure}[htbp]
 \centerline{\includegraphics[width=1\columnwidth]{model.png}}
@@ -49,11 +49,11 @@ Nesse contexto, vem sendo desenvolvidos algorítmos que identificam quais restri
 
 A resolução de restrições é um problema NP-Completo. Identificadores de conflito ou diagnóstico são baseados em alguma estratégia de busca em árvore executando a resolução multiplas vezes. É frequente a necessidade de otimização dessas soluções para atender demandas por menores tempos de resposta.
 
-Esse trabalho propõe-se a explorar alternativas de otimização de idenficadores de conflito e diagnóstico por meio de estratégias de computação paralela. 
+Esse trabalho propõe-se a explorar alternativas de otimização de identificadores de conflito e diagnóstico por meio de estratégias de computação paralela. 
 
 \section{Trabalhos relacionados}
 
-É possível encontrar trabalhos de otimização de idenficadores de conflito e diagnóstico com computação paralela em publicações envolvendo otimização de configuradores de produto. 
+É possível encontrar trabalhos de otimização de identificadores de conflito e diagnóstico com computação paralela em publicações envolvendo otimização de configuradores de produto. 
 
 Em [1] é proposto um algorítmo alternativo para a identificação de conflitos baseado em técnicas de de lookahead, onde caminhos alternativos na busca por conflitos são executados paralelamente de forma antecipada. Na medida em que são executados passam a compor uma lookup-table de resultados que é aproveitada pela busca principal.
 
@@ -80,7 +80,7 @@ O segundo nível é o identificador de conflitos. Trata-se se uma algorítmo de 
 \label{fig}
 \end{figure}
 
-O terceiro nível é o idenficador de diagnósticos. Trata-se de um algorítmo de busca em largura. Caminhos nessa busca representam alternativas de diagnóstico. Novos caminhos são identificados a partir da permutação de opções do caminho percorrido até então.
+O terceiro nível é o identificador de diagnósticos. Trata-se de um algorítmo de busca em largura. Caminhos nessa busca representam alternativas de diagnóstico. Novos caminhos são identificados a partir da permutação de opções do caminho percorrido até então.
 
 \section{Paralelização do algorítmo}
 
@@ -88,11 +88,11 @@ Em primeira análise foi necessário definir qual etapa teria maior relevância 
 
 A estratégia de paralelização da resolução de restrições não é recomendada pelos responsáveis pelos programas resolvedores [3]. Justamente por darem preferência à estratégias de paralelização de busca em um nível superior.
 
-A estratégia de paralelização da identificação de conflitos se mostrou viável, porém só trás ganhos significativos quando baseada em implementações avançadas que se aproveitam de lookaheads [1], ou equivalentes. 
+A estratégia de paralelização da identificação de conflitos se mostrou viável, porém só traz ganhos significativos quando baseada em implementações avançadas que se aproveitam de lookaheads [1], ou equivalentes. 
 
 Baseado na análise feita em [2], fica identificado que a melhor candidata à um trabalho de otimização é a etapa de identificação de diagnósticos.
 
-Com essa escolha, tomando como uma implementação sequencial do algorítmo de idenficiação de diagnósticos foi implementada uma alteração no seu loop principal. A implementação de referência utiliza uma estrutura de dados de fila para manter a lista de soluções de condidatas pendentes de processamento. 
+Com essa escolha, tomando comouma implementação sequencial do algorítmo de identificação de diagnósticos foi implementada uma alteração no seu loop principal. A implementação de referência utiliza uma estrutura de dados de fila para manter a lista de soluções de condidatas pendentes de processamento. 
 
 A implementação desenvolvida no presente trabalho aproveita-se  dessa fila para processar todos os items pendentes em uma certa iteração do algorítmo ao mesmo tempo. Dessa maneira a progressão da busca acontece de tal maneira que um nível inteiro da busca em largura é processado de forma concorrente. A figura 4 ilustra esse procedimento.
 
@@ -124,7 +124,7 @@ A figura 5 resume os resultados encontrados nas simulações. Os tempos são inf
 
 \section{Conclusões}
 
-Identifica-se que há benefício na otimização da busca por soluções de conflito baseada em paralelização da identificação de diagnósticos. Outras otimizações não exploradas nesse trabalho podem trazer outros ganhos, em particular a customização avançada das API de execução paralela e testes em hardware dedicado para execução paralela.
+Nota-se que há benefício na otimização da busca por soluções de conflito baseada em paralelização da identificação de diagnósticos. Outras otimizações não exploradas nesse trabalho podem trazer outros ganhos, em particular a customização avançada das API de execução paralela e testes em hardware dedicado para execução paralela.
 
 \begin{thebibliography}{00}
 \bibitem{b1} C. V. Silva, A. Felfernig, J. Galindo, M. Atas, and D. Benavides, “A Parallelized Variant of Junker’s QuickXPlain Algorithm,” in Foundations of Intelligent Systems, vol. 12117, D. Helic, G. Leitner, M. Stettinger, A. Felfernig, and Z. W. Raś, Eds. Cham: Springer International Publishing, 2020, pp. 457–468.
