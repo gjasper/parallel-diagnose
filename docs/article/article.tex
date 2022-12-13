@@ -40,11 +40,10 @@ Configuradores de produto apresentam opções à um usuário baseado em um conju
 A figura 1 ilustra um modelo de configurador de produto de um robô de faxina. No modelo é possível identificar características do produto que ficam disponíveis para escolha do usuário. Também é possível idenfiticar restrições entre os valores das caraterísticas.
 
 \begin{figure}[htbp]
-\centerline{\includegraphics[width=0.7\columnwidth]{model.png}}
+\centerline{\includegraphics[width=1\columnwidth]{model.png}}
 \caption{Modelo configurável de um robô de faxina} 
 \label{fig}
 \end{figure}
-
 
 Nesse contexto, vem sendo desenvolvidos algorítmos que identificam quais restrições (ou decisões) fazem parte dos conflitos. Uma vez que é possível que mais de um conflito esteja presente em uma certa situação do modelo, outro conjunto de algorítmos vem sendo desenvolvidos para identificar soluções. Essas duas famílias de algorítmos são chamadas de identificadores de conflitos e identificadores de diagnósticos, respectivamente.
 
@@ -98,7 +97,7 @@ Com essa escolha, tomando como uma implementação sequencial do algorítmo de i
 A implementação desenvolvida no presente trabalho aproveita-se  dessa fila para processar todos os items pendentes em uma certa iteração do algorítmo ao mesmo tempo. Dessa maneira a progressão da busca acontece de tal maneira que um nível inteiro da busca em largura é processado de forma concorrente. A figura 4 ilustra esse procedimento.
 
 \begin{figure}[htbp]
-\centerline{\includegraphics[width=0.7\columnwidth]{runtime.png}}
+\centerline{\includegraphics[width=1\columnwidth]{runtime.png}}
 \caption{Cada nível da busca é uma execução paralela de tasks} 
 \label{fig}
 \end{figure}
@@ -125,7 +124,7 @@ A figura 5 resume os resultados encontrados nas simulações. Os tempos são inf
 
 \section{Conclusões}
 
-Identifica-se que há benefício na otimização da busca por soluções de conflito baseada em paralelização da identificação de diagnósticos. Destaca-se que há diversas caminhos não explorados nessa linha, como customização avançada das API de execução paralela, hardware dedicado para execução paralela (em alternativa ao computador pessoal).
+Identifica-se que há benefício na otimização da busca por soluções de conflito baseada em paralelização da identificação de diagnósticos. Outras otimizações não exploradas nesse trabalho podem trazer outros ganhos, em particular a customização avançada das API de execução paralela e testes em hardware dedicado para execução paralela.
 
 \begin{thebibliography}{00}
 \bibitem{b1} C. V. Silva, A. Felfernig, J. Galindo, M. Atas, and D. Benavides, “A Parallelized Variant of Junker’s QuickXPlain Algorithm,” in Foundations of Intelligent Systems, vol. 12117, D. Helic, G. Leitner, M. Stettinger, A. Felfernig, and Z. W. Raś, Eds. Cham: Springer International Publishing, 2020, pp. 457–468.
@@ -136,4 +135,3 @@ Identifica-se que há benefício na otimização da busca por soluções de conf
 \end{thebibliography}
 \vspace{12pt}
 \end{document}
-
